@@ -1,0 +1,43 @@
+version: '3.1'
+
+services:
+  db:
+    image: mysql:5.7
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    environment:
+      MYSQL_USER: dbuser
+      MYSQL_PASSWORD: dbpass
+      MYSQL_ROOT_PASSWORD: dbpass
+    volumes:
+      - ./dump:/docker-entrypoint-initdb.d
+    ports:
+      - 3306:3306
+
+  web:
+    tty: true
+    stdin_open: true
+    command: sh /docker-entrypoint.sh
+    build: ./docker/web
+    links:
+      - db
+      - mailhog
+    ports:
+      - 3000:3000
+    volumes:
+      - .:/app:cached
+      - bundle_cache:/app/vendor/bundle
+    environment:
+      HOST: localhost
+      PORT: 3000
+      DB_USER: root
+      DB_PASSWORD: dbpass
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_ADAPTER: mysql2
+
+  mailhog:
+    image: mailhog/mailhog
+    ports:
+      - 8025:8025
+volumes:
+  bundle_cache:
