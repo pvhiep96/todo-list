@@ -5,16 +5,12 @@ class TodosController < ApplicationController
   # GET /todos
   def index
     per_page = 10
-    @todos = @current_user.todos.not_complete.page(params[:page] || 1).per(per_page)
+    @todos = @current_user.todos.page(params[:page] || 1).per(per_page)
     total_pages = @todos.total_pages
-    @todos_complete = @current_user.todos.complete.page(params[:page] || 1).per(per_page)
-    total_complete_pages = @todos_complete.total_pages
     response = {
       todos: @todos,
       per_page: per_page,
       total_pages: total_pages,
-      todos_complete: @todos_complete,
-      total_complete_pages: total_complete_pages,
       status: :ok
     }
     render json: response
